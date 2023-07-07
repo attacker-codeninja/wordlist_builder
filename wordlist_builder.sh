@@ -6,6 +6,12 @@ then
 	exit 1
 fi
 
+# TO LOOK INTO:
+#https://github.com/maverickNerd/wordlists/blob/master/SecListsCurated/quickhits.txt
+#https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/aem2.txt
+#https://github.com/danielmiessler/SecLists/tree/master/Discovery/Web-Content/CMS
+#https://github.com/danielmiessler/SecLists/tree/master/Discovery/Web-Content/WebTechnologyPaths-Trickest-Wordlists
+
 out_dir=$1
 tmp_dir=`mktemp -d`
 trap "rm -rf $tmp_dir" EXIT
@@ -49,38 +55,36 @@ directory_lists=(
 
 iis_asp_wordlists=(
 	"https://wordlists-cdn.assetnote.io/data/automated/httparchive_aspx_asp_cfm_svc_ashx_asmx_2023_06_28.txt"
+	"https://wordlists-cdn.assetnote.io/data/manual/asp_lowercase.txt"
+	"https://wordlists-cdn.assetnote.io/data/manual/aspx_lowercase.txt"
 	"https://raw.githubusercontent.com/assetnote/commonspeak2-wordlists/master/wordswithext/aspx.txt"
 	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/IIS.fuzz.txt"
 	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/iis-systemweb.txt"
+	"https://raw.githubusercontent.com/SooLFaa/fuzzing/master/webserver/iis.txt"
 )
 tomcat_jsp_wordlists=(
 	"https://wordlists-cdn.assetnote.io/data/automated/httparchive_jsp_jspa_do_action_2023_06_28.txt"
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_tomcat_2023_06_28.txt"
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_spring_2023_06_28.txt"
+	"https://wordlists-cdn.assetnote.io/data/manual/do.txt"
+	"https://wordlists-cdn.assetnote.io/data/manual/jsp.txt"
+	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/tomcat.txt"
+	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/ApacheTomcat.fuzz.txt"
+	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/WebTechnologyPaths-Trickest-Wordlists/tomcat-all-levels.txt"
 )
 apache_php_wordlists=(
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_apache_2023_06_28.txt"
 	"https://wordlists-cdn.assetnote.io/data/automated/httparchive_php_2023_06_28.txt"
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_laravel_2023_06_28.txt"
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_zend_2023_06_28.txt"
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_yii_2023_06_28.txt"
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_symfony_2023_06_28.txt"
+	"https://wordlists-cdn.assetnote.io/data/automated/httparchive_cgi_pl_2023_06_28.txt"
+	"https://wordlists-cdn.assetnote.io/data/manual/php.txt"
+	"https://wordlists-cdn.assetnote.io/data/manual/pl.txt"
+	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/Apache.fuzz.txt"
+	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/apache.txt"
 )
 nginx_wordlists=(
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_nginx_2023_06_28.txt"
-)
-django_wordlists=(
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_django_2023_06_28.txt"
-)
-flask_wordlists=(
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_flask_2023_06_28.txt"
-)
-express_wordlists=(
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_express_2023_06_28.txt"
+	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/nginx.txt"
 )
 rails_wordlists=(
-	"https://wordlists-cdn.assetnote.io/data/technologies/httparchive_rails_2023_06_28.txt"
+	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/ror.txt"
 )
+
 api_wordlists=(
 	"https://wordlists-cdn.assetnote.io/data/automated/httparchive_apiroutes_2023_06_28.txt"
 )
@@ -99,6 +103,8 @@ normalize_prefix() {
 filter_junk() {
 	read_from_stdin \
 		| rev | cut -d '/' -f 1 | cut -d '\' -f 1 | rev \
+		| grep -E '[A-Za-z0-9]' \
+		| grep -Ev '.{100,}' \
 		| grep -a -v 'filename:' \
 		| grep -v '\.\.' \
 		| grep -v \* \
@@ -106,6 +112,7 @@ filter_junk() {
 		| grep -v '%' \
 		| grep -v '&' \
 		| grep -v "??" \
+		| grep -v "$$" \
 		| grep -v '\- ' \
 		| grep -v '>>' \
 		| grep -v '::' \
@@ -222,32 +229,32 @@ do
 done
 filter_duplicates $out_dir/tech/nginx.txt
 
-for list in "${django_wordlists[@]}"
-do
-	temp=`mktemp`
-	curl -s $list -o $temp
-	cat $temp | normalize_prefix | filter_junk | anew $out_dir/tech/django.txt >/dev/null
-	rm $temp
-done
-filter_duplicates $out_dir/tech/django.txt
+# for list in "${django_wordlists[@]}"
+# do
+	# temp=`mktemp`
+	# curl -s $list -o $temp
+	# cat $temp | normalize_prefix | filter_junk | anew $out_dir/tech/django.txt >/dev/null
+	# rm $temp
+# done
+# filter_duplicates $out_dir/tech/django.txt
 
-for list in "${flask_wordlists[@]}"
-do
-	temp=`mktemp`
-	curl -s $list -o $temp
-	cat $temp | normalize_prefix | filter_junk | anew $out_dir/tech/flask.txt >/dev/null
-	rm $temp
-done
-filter_duplicates $out_dir/tech/flask.txt
+# for list in "${flask_wordlists[@]}"
+# do
+	# temp=`mktemp`
+	# curl -s $list -o $temp
+	# cat $temp | normalize_prefix | filter_junk | anew $out_dir/tech/flask.txt >/dev/null
+	# rm $temp
+# done
+# filter_duplicates $out_dir/tech/flask.txt
 
-for list in "${express_wordlists[@]}"
-do
-	temp=`mktemp`
-	curl -s $list -o $temp
-	cat $temp | normalize_prefix | filter_junk | anew $out_dir/tech/express.txt >/dev/null
-	rm $temp
-done
-filter_duplicates $out_dir/tech/express.txt
+# for list in "${express_wordlists[@]}"
+# do
+	# temp=`mktemp`
+	# curl -s $list -o $temp
+	# cat $temp | normalize_prefix | filter_junk | anew $out_dir/tech/express.txt >/dev/null
+	# rm $temp
+# done
+# filter_duplicates $out_dir/tech/express.txt
 
 for list in "${rails_wordlists[@]}"
 do
