@@ -28,7 +28,7 @@ high_impact_lists=(
 	"https://wordlists-cdn.assetnote.io/data/manual/bak.txt"
 	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/Common-DB-Backups.txt"
 	"https://raw.githubusercontent.com/aristosMiliaressis/wordlist_builder/master/temp/high-impact-files.txt"
-	
+
 	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/hashicorp-vault.txt"
 	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/hashicorp-consul-api.txt"
 	"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/CommonBackdoors-ASP.fuzz.txt"
@@ -126,7 +126,7 @@ filter_files() {
 }
 
 grep_high_impact_extensions() {
-	grep -a -hirE '\.(log|bz2|tgz|bzip2|pem|crt|key|gzip|passwd|pac|swp|sav|bak|backup|tar|zip|7z|gz|rar|db|sqlite|sqlite3|mdb|sql|ini|cfg|conf|config|properties|ppk|env|rdp|pgp|psql)$' \
+	grep -a -hirE '\.(log|ovpn|bz2|tgz|bzip2|pem|crt|key|gzip|settings|setting|passwd|sh|pac|swp|sav|bak|backup|tar|zip|7z|gz|lz|xz|z|rar|war|db|sqlite|sqlitedb|sqlite3|mdb|sql|ini|cfg|conf|config|properties|ppk|env|rdp|pgp|psql)$' \
 		| filter_junk
 }
 
