@@ -140,6 +140,10 @@ filter_recursive_deadends() {
 		| grep -Eiv '^(img|image|images|font|fonts|css|style|styles|resources|assets)[\/]*$'
 }
 
+lowercase() {
+	read_from_stdin | tr '[:upper:]' '[:lowe:]' | sort -u
+}
+
 filter_duplicates() {
 	temp=`mktemp`
 	cat $1 | sort -u > $temp
@@ -164,6 +168,8 @@ done
 grep_high_impact_extensions | anew $out_dir/high_impact.txt >/dev/null
 filter_duplicates $out_dir/high_impact.txt
 
+cat $out_dir/high_impact.txt | lowercase | $out_dir/high_impact_lowercase.txt
+
 for list in "${file_lists[@]}"
 do
 	temp=`mktemp`
@@ -183,6 +189,8 @@ do
 	rm $temp
 done
 filter_duplicates $out_dir/directories.txt
+
+cat $out_dir/directories.txt | lowercase | $out_dir/directories.txt
 
 for list in "${iis_asp_wordlists[@]}"
 do
