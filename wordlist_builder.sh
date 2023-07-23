@@ -141,7 +141,7 @@ filter_recursive_deadends() {
 }
 
 lowercase() {
-	read_from_stdin | tr '[:upper:]' '[:lowe:]' | sort -u
+	read_from_stdin | tr '[:upper:]' '[:lower:]' | sort -u
 }
 
 filter_duplicates() {
